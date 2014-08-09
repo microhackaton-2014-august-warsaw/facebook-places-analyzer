@@ -38,7 +38,7 @@ class MyTestCase(unittest.TestCase):
 def tests_aaa():
 
     print("facebook_correlator.requests.call[0]\n")
-    facebook_correlator.post_localizations('test')
+    facebook_correlator.post_localizations({"pair_id":'test'})
 
     
     assert len(facebook_correlator.requests.calls) == 1

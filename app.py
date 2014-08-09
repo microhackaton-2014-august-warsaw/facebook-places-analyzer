@@ -55,6 +55,7 @@ def consume_posts(ch, method, properties, body):
         print(e)
         logging.info(e)
 
+facebook_correlator_url = 'private-2876e-microservice1.apiary-mock.com'
 
 if __name__ == '__main__':
 
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     try:
         facebook_correlator_url = sd.get_instance('common-places-correlator')
     except:
-        facebook_correlator_url = 'private-2876e-microservice1.apiary-mock.com'
+        pass
 
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=queue_host, port=settings.RABBITMQ_PORT)
