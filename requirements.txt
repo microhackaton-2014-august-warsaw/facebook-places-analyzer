@@ -1,2 +1,2 @@
-pyramid
+pika==0.9.8
 

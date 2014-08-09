@@ -1,15 +1,26 @@
-from wsgiref.simple_server import make_server
-from pyramid.config import Configurator
-from pyramid.response import Response
+#!/usr/bin/env python
+import pika
+import logging
 
-def hello_world(request):
-    return Response('Hello %(name)s!' % request.matchdict)
+
+def consume_posts(ch, method, properties, body):
+    print "Consuming posts: {}".format(body)
+
 
 if __name__ == '__main__':
-    config = Configurator()
-    config.add_route('hello', '/hello/{name}')
-    config.add_view(hello_world, route_name='hello')
-    app = config.make_wsgi_app()
-    server = make_server('0.0.0.0', 8080, app)
-    server.serve_forever()
+    logging.info("Initializing app")
 
+    logging.info("Connecting to queue")
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+
+    channel = connection.channel()
+
+    # Make sure the queue exists
+    channel.queue_declare(queue='facebook_posts')
+
+    print ' [*] Waiting for messages. To exit press CTRL+C'
+
+    channel.basic_consume(consume_posts, queue='facebook_posts')
+
+    channel.start_consuming()
