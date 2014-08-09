@@ -16,6 +16,8 @@ class MyTestCase(unittest.TestCase):
         data = json.loads(f.read())
         output = app.prepare_json_output(data)
         assert len(output["places"]) == 3
+        assert output["corelationId"] == '1'
+        assert output["pairId"] == '1'
 
     def test_latlon_to_city(self):
         asserts = {

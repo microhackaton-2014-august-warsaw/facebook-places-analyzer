@@ -20,8 +20,8 @@ def place_with_probability(place):
 
 
 def prepare_json_output(data):
-    profileLocation = data["hometown"]["location"]
-    profileHometown = data["location"]["location"]
+    profileLocation = data["profile"]["hometown"]["location"]
+    profileHometown = data["profile"]["location"]["location"]
     places = list()
     profileLocationCode = place_data(profileLocation)
     places.append(place_with_probability(profileLocationCode))
@@ -36,7 +36,8 @@ def prepare_json_output(data):
             places.append(place_with_probability(code))
             print post["place"]["location"]
     output = dict()
-    output["correlation_id"] = 123
+    output["corelationId"] = data["corelationId"]
+    output["pairId"] = data["pairId"]
     output["places"] = places
     return output
 
