@@ -1,22 +1,20 @@
 #!/usr/bin/env python
+from latlontool import place_data
 import pika
 import logging
-import urllib2
 
 
 def consume_posts(ch, method, properties, body):
     print "Consuming posts: {}".format(body)
 
 
-def test_lat_lon_to_country_code():
-    print(urllib2.urlopen(
-        'http://api.geonames.org/countryCode?lat=52.203226263818&lng=21.0467223005&username=a273719').read())
-
-
 if __name__ == '__main__':
     logging.info("Initializing app")
 
-    test_lat_lon_to_country_code()
+    print (place_data(52.203226263818, 21.0467223005))
+    print (place_data(49.418874, 7.321701))
+    print (place_data(48.135125, 11.581981))
+    print (place_data(37.774929, -122.419416))
 
     logging.info("Connecting to queue")
 
