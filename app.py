@@ -2,19 +2,20 @@
 from latlontool import place_data
 import pika
 import logging
-
+import urllib2
+import json
 
 def consume_posts(ch, method, properties, body):
-    print "Consuming posts: {}".format(body)
+    data = json.loads(body)
+    profileLocation = data["hometown"]["location"]
+    profileHometown = data["location"]["location"]
+    locationPost0 = data["posts"][0]["place"]["location"]
+    print "Consuming posts: {}".format(data)
 
 
 if __name__ == '__main__':
     logging.info("Initializing app")
 
-    print (place_data(52.203226263818, 21.0467223005))
-    print (place_data(49.418874, 7.321701))
-    print (place_data(48.135125, 11.581981))
-    print (place_data(37.774929, -122.419416))
 
     logging.info("Connecting to queue")
 
