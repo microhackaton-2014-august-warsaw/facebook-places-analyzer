@@ -18,7 +18,6 @@ def place_data(location):
 def place_with_probability(place):
     place_extended = dict()
     place_extended["place"] = place
-    place_extended["probability"] = "high"
     place_extended["origin"] = "facebook"
     return place_extended
 
@@ -41,6 +40,7 @@ def consume_posts(ch, method, properties, body):
                 places.append(place_with_probability(code))
                 print post["place"]["location"]
         output = dict()
+        output["correlation_id"] = 123
         output["places"] = places
         facebook_correlator.post_localizations(output)
         print "Consuming posts: {}".format(data)
