@@ -1,6 +1,9 @@
+import logging
 import unittest
+from dingus import patch
 import app
 import latlontool
+import facebook_correlator
 
 class MyTestCase(unittest.TestCase):
     def test_sample(self):
@@ -21,3 +24,12 @@ class MyTestCase(unittest.TestCase):
     def test_posting_to_correlator(self):
         pass
 
+
+@patch('facebook_correlator.requests')
+def tests_aaa():
+
+    print("facebook_correlator.requests.call[0]\n")
+    facebook_correlator.post_localizations('test')
+
+    
+    assert len(facebook_correlator.requests.calls) == 1
