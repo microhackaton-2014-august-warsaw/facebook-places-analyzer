@@ -11,7 +11,8 @@ channel = connection.channel()
 
 channel.queue_declare(queue=QUEUE_NAME)
 
-channel.basic_publish(exchange='', routing_key=('%s' % QUEUE_NAME), body='Hello World!')
+json_string = open('fake_message.json', 'r').read()
+channel.basic_publish(exchange='', routing_key=QUEUE_NAME, body=json_string)
 
 print " [x] Sent 'Hello World!'"
 
