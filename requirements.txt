@@ -2,3 +2,4 @@ pika==0.9.8
 nose
 requests
 dingus
+microhackaton-service-discovery-py

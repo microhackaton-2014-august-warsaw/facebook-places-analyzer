@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import logging
 import json
 import latlontool
@@ -6,6 +7,8 @@ import latlontool
 import pika
 import facebook_correlator
 import settings
+
+from service_discovery import ServiceDiscovery
 
 
 def place_data(location):
@@ -54,12 +57,32 @@ def consume_posts(ch, method, properties, body):
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(
+        filename=settings.LOGGING_FILE,
+        level=logging.INFO,
+        format=u"%(asctime)s.%(msecs).03d+0200 | %(levelname)s | | walSięGościu | | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     logging.info("Initializing app")
 
     logging.info("Connecting to queue")
 
+    sd = ServiceDiscovery('/pl/pl/microhackaton', 'zookeeper.microhackathon.pl:2181')
+
+    try:
+        queue_host = sd.get_instance('rabitmq')
+    except:
+        queue_host = settings.RABBITMQ_HOST
+
+    try:
+        facebook_correlator_url = sd.get_instance('common-places-correlator')
+    except:
+        facebook_correlator_url = 'private-2876e-microservice1.apiary-mock.com'
+
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=settings.RABBITMQ_HOST, port=settings.RABBITMQ_PORT)
+        pika.ConnectionParameters(host=queue_host, port=settings.RABBITMQ_PORT)
     )
 
     channel = connection.channel()
