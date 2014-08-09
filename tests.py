@@ -4,11 +4,18 @@ from dingus import patch
 import app
 import latlontool
 import facebook_correlator
+import json
 
 class MyTestCase(unittest.TestCase):
     def test_sample(self):
         f = open('fake_message.json', 'r')
         app.consume_posts(None,None,None,f.read())
+
+    def test_prepare_json_output(self):
+        f = open('fake_message.json', 'r')
+        data = json.loads(f.read())
+        output = app.prepare_json_output(data)
+        assert len(output["places"]) == 3
 
     def test_latlon_to_city(self):
         asserts = {

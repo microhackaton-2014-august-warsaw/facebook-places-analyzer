@@ -19,27 +19,32 @@ def place_with_probability(place):
     return place_extended
 
 
+def prepare_json_output(data):
+    profileLocation = data["hometown"]["location"]
+    profileHometown = data["location"]["location"]
+    places = list()
+    profileLocationCode = place_data(profileLocation)
+    places.append(place_with_probability(profileLocationCode))
+    profileHometownCode = place_data(profileHometown)
+    places.append(place_with_probability(profileHometownCode))
+    posts = data["posts"]
+    for post in posts:
+        print post["created_time"]
+        if "place" in post:
+            location = post["place"]["location"]
+            code = place_data(location)
+            places.append(place_with_probability(code))
+            print post["place"]["location"]
+    output = dict()
+    output["correlation_id"] = 123
+    output["places"] = places
+    return output
+
 def consume_posts(ch, method, properties, body):
     try:
         data = json.loads(body)
-        profileLocation = data["hometown"]["location"]
-        profileHometown = data["location"]["location"]
-        places = list()
-        profileLocationCode = place_data(profileLocation)
-        places.append(place_with_probability(profileLocationCode))
-        profileHometownCode = place_data(profileHometown)
-        places.append(place_with_probability(profileHometownCode))
-        posts = data["posts"]
-        for post in posts:
-            print post["created_time"]
-            if "place" in post:
-                location = post["place"]["location"]
-                code = place_data(location)
-                places.append(place_with_probability(code))
-                print post["place"]["location"]
-        output = dict()
-        output["correlation_id"] = 123
-        output["places"] = places
+
+        output = prepare_json_output(data)
         facebook_correlator.post_localizations(output)
         print "Consuming posts: {}".format(data)
     except Exception, e:
