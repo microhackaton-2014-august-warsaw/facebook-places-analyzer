@@ -1,8 +1,23 @@
 import unittest
 import app
-
+import latlontool
 
 class MyTestCase(unittest.TestCase):
     def test_sample(self):
         f = open('fake_message.json', 'r')
         app.consume_posts(None,None,None,f.read())
+
+    def test_latlon_to_city(self):
+        asserts = {
+            (52.203226263818, 21.0467223005): {'name': u'Warszawa', 'country_code': u'PL'},
+            (49.418874, 7.321701): {'name': u'Dunzweiler', 'country_code': u'DE'},
+            (48.135125, 11.581981): {'name': u'M\xfcnchen', 'country_code': u'DE'},
+            (37.774929, -122.419416): {'name': u'San Francisco', 'country_code': u'US'},
+        }
+
+        for latlon in asserts:
+            self.assertEqual(latlontool.place_data(*latlon), asserts[latlon])
+
+    def test_posting_to_correlator(self):
+        pass
+

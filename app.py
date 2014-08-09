@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 from latlontool import place_data
+from os import environ
 import pika
 import logging
 import urllib2
 import json
+
+
+RABBITMQ_HOST = environ.get('RABBITMQ_HOST') or 'localhost'
+RABBITMQ_PORT = environ.get('RABBITMQ_PORT') or 5672
 
 def consume_posts(ch, method, properties, body):
     data = json.loads(body)
@@ -16,10 +21,9 @@ def consume_posts(ch, method, properties, body):
 if __name__ == '__main__':
     logging.info("Initializing app")
 
-
     logging.info("Connecting to queue")
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT))
 
     channel = connection.channel()
 
