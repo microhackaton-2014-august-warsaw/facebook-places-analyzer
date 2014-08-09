@@ -3,23 +3,21 @@ import logging
 import json
 import latlontool
 
-from os import environ
 import pika
 import facebook_correlator
-
-QUEUE_NAME = 'facebook_posts'
-RABBITMQ_HOST = environ.get('RABBITMQ_HOST') or 'localhost'
-RABBITMQ_PORT = environ.get('RABBITMQ_PORT') or 5672
+import settings
 
 
 def place_data(location):
     return latlontool.place_data(location["latitude"], location["longitude"])
+
 
 def place_with_probability(place):
     place_extended = dict()
     place_extended["place"] = place
     place_extended["origin"] = "facebook"
     return place_extended
+
 
 def consume_posts(ch, method, properties, body):
     try:
@@ -54,13 +52,14 @@ if __name__ == '__main__':
 
     logging.info("Connecting to queue")
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=settings.RABBITMQ_HOST, port=settings.RABBITMQ_PORT)
+    )
 
     channel = connection.channel()
 
     # Make sure the queue exists
-    channel.queue_declare(queue=QUEUE_NAME)
-    channel.queue_declare(queue='facebook_posts')
+    channel.queue_declare(queue=settings.QUEUE_NAME)
 
     print ' [*] Waiting for messages. To exit press CTRL+C'
 
