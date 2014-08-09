@@ -23,6 +23,8 @@ def place_with_probability(place):
 
 
 def prepare_json_output(data):
+    f = open('fake_message.json', 'r')
+    data = f.read()
     profileLocation = data["profile"]["hometown"]["location"]
     profileHometown = data["profile"]["location"]["location"]
     places = list()
@@ -45,15 +47,11 @@ def prepare_json_output(data):
     return output
 
 def consume_posts(ch, method, properties, body):
-    try:
-        data = json.loads(body)
+    data = json.loads(body)
 
-        output = prepare_json_output(data)
-        facebook_correlator.post_localizations(output)
-        print "Consuming posts: {}".format(data)
-    except Exception, e:
-        print(e)
-        logging.info(e)
+    output = prepare_json_output(data)
+    facebook_correlator.post_localizations(output)
+    print "Consuming posts: {}".format(data)
 
 facebook_correlator_url = 'private-2876e-microservice1.apiary-mock.com'
 
@@ -71,11 +69,9 @@ if __name__ == '__main__':
     logging.info("Connecting to queue")
 
     sd = ServiceDiscovery('/pl/pl/microhackaton', 'zookeeper.microhackathon.pl:2181')
+    sd.register("facebook-places-analyser", "", 0)
 
-    try:
-        queue_host = sd.get_instance('rabitmq')
-    except:
-        queue_host = settings.RABBITMQ_HOST
+    queue_host = settings.RABBITMQ_HOST
 
     try:
         facebook_correlator_url = sd.get_instance('common-places-correlator')
@@ -83,16 +79,21 @@ if __name__ == '__main__':
         pass
 
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=queue_host, port=settings.RABBITMQ_PORT)
+        pika.ConnectionParameters(host=queue_host)
     )
 
     channel = connection.channel()
 
     # Make sure the queue exists
-    channel.queue_declare(queue=settings.QUEUE_NAME)
+    queue = channel.queue_declare()
+    queue_name = queue.method.queue
+
+    channel.queue_bind(exchange='facebook',
+                   queue=queue_name)
+
 
     print ' [*] Waiting for messages. To exit press CTRL+C'
 
-    channel.basic_consume(consume_posts, queue='facebook_posts')
+    channel.basic_consume(consume_posts, queue=queue_name)
 
     channel.start_consuming()
