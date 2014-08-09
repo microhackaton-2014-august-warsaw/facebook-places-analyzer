@@ -40,10 +40,6 @@ def consume_posts(ch, method, properties, body):
                 code = place_data(location)
                 places.append(place_with_probability(code))
                 print post["place"]["location"]
-        locationPost0 = data["posts"][0]["place"]["location"]
-        profileLocation = data["hometown"]["location"]
-        profileHometown = data["location"]["location"]
-        locationPost0 = data["posts"][0]["place"]["location"]
         output = dict()
         output["places"] = places
         facebook_correlator.post_localizations(output)
